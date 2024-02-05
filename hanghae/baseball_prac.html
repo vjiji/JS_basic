@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Baseball</title>
+    <style>
+      .container {
+        width: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      #reset_button {
+        margin-left: 20px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <p>it's funny Gaseball Game !</p>
+    </header>
+    <main>
+      <div class="container">
+        <p id="number_text"></p>
+        <button id="reset_button">start</button>
+      </div>
+      <div class="container">
+        <input type="number" id="submit_number" style="width: 50px" />
+        <button id="submit_button">submit</button>
+      </div>
+      <hr />
+      <div id="score_container"></div>
+    </main>
+
+    <script>
+      let currentNum = "";
+      const resetButton = document.getElementById("reset_button");
+
+      function setButton() {
+        resetButton.addEventListener("click", () => resetNumber());
+      }
+      let numberList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+      function resetNumber() {
+        currentNum = "";
+        for (let i = 0; i < 3; i++) {
+          const randomNum = Math.floor(Math.random() * (10 - i));
+          currentNum += numberList[randomNum];
+
+          numberList.splice(randomNum, 1);
+        }
+        console.log(numberList, currentNum);
+        numberList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        setButtonText();
+      }
+
+      function setButtonText() {
+        const numTag = document.getElementById("number_text");
+        numTag.innerText = currentNum;
+
+        if (!currentNum) {
+          resetButton.innerText = "start!";
+        } else {
+          resetButton.innerText = "reset Number";
+        }
+      }
+
+      function setSubmit() {
+        const submitButton = document.getElementById("submit_button");
+        submitButton.addEventListener("click", () => submit());
+      }
+
+      let scoreCount = 0;
+
+      function checkAnswer() {
+        let submitInput = document.getElementById("submit_number");
+        let submitNum = submitInput.value;
+        let answerNum = String(currentNum);
+
+        let strike = 0;
+        let ball = 0;
+        for (let i = 0; i < 3; i++) {
+          if (submitNum[i] === answerNum[i]) {
+            strike += 1;
+          } else if (submitNum.includes(answerNum[i])) {
+            ball += 1;
+          }
+        }
+        renderScore(strike, ball);
+      }
+
+      function renderScore(strike, ball) {
+        let scoreText = "";
+        let countText = "";
+        scoreCount += 1;
+
+        if (strike === 3) {
+          window.alert("정답!");
+          countText = `${scoreCount}번만에 맞히셨습니다.`;
+          scoreText = ` 게임을 종료합니다.`;
+        }
+
+        if (strike + ball < 1) {
+          countText = `${scoreCount}번째 시도: answer_num`;
+          scoreText = ` 맞는 숫자가 없습니다!`;
+        } else {
+          countText = `${scoreCount}번째 시도: answer_num`;
+          scoreText = ` strike: ${strike} / ball: ${ball}`;
+        }
+
+        const newCount = document.createElement("p");
+        const newScore = document.createElement("p");
+        newCount.textContent = countText;
+        newScore.textContent = scoreText;
+        document.getElementById("score_container").appendChild(newCount);
+        document.getElementById("score_container").appendChild(newScore);
+      }
+
+      function submit() {
+        let submitInput = document.getElementById("submit_number").value;
+
+        if (!currentNum) {
+          window.alert("start버튼을 먼저 눌러주세요!");
+          return;
+        }
+        // console.log(submitInput.length);
+        // console.log(submitInput.length === 3);
+        // if (submitInput.legnth !== 3) {
+        //   window.alert("3자리 숫자를 입력해주세요!");
+        //   return;
+        // }
+
+        if (
+          submitInput[0] === submitInput[1] ||
+          submitInput[0] === submitInput[2] ||
+          submitInput[1] === submitInput[2]
+        ) {
+          window.alert("서로 다른 3개의 숫자를 입력해주세요!");
+          return;
+        }
+        checkAnswer();
+      }
+
+      setButton();
+      setSubmit();
+    </script>
+  </body>
+</html>
