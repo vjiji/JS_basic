@@ -20,7 +20,7 @@
 
   <body>
     <header>
-      <p>it's funny Gaseball Game !</p>
+      <p>야구 게임</p>
     </header>
     <main>
       <div class="container">
@@ -37,35 +37,13 @@
 
     <script>
       let currentNum = "";
+      let numberList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+      let scoreCount = 0;
+
       const resetButton = document.getElementById("reset_button");
 
       function setButton() {
         resetButton.addEventListener("click", () => resetNumber());
-      }
-      let numberList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-      function resetNumber() {
-        currentNum = "";
-        for (let i = 0; i < 3; i++) {
-          const randomNum = Math.floor(Math.random() * (10 - i));
-          currentNum += numberList[randomNum];
-
-          numberList.splice(randomNum, 1);
-        }
-        console.log(numberList, currentNum);
-        numberList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        setButtonText();
-      }
-
-      function setButtonText() {
-        const numTag = document.getElementById("number_text");
-        numTag.innerText = currentNum;
-
-        if (!currentNum) {
-          resetButton.innerText = "start!";
-        } else {
-          resetButton.innerText = "reset Number";
-        }
       }
 
       function setSubmit() {
@@ -73,11 +51,29 @@
         submitButton.addEventListener("click", () => submit());
       }
 
-      let scoreCount = 0;
+      function resetNumber() {
+        currentNum = "";
+        scoreCount = 0;
+        document.getElementById("score_container").innerHTML = "";
+        for (let i = 0; i < 3; i++) {
+          const randomNum = Math.floor(Math.random() * (10 - i));
+          currentNum += numberList[randomNum];
 
-      function checkAnswer() {
-        let submitInput = document.getElementById("submit_number");
-        let submitNum = submitInput.value;
+          numberList.splice(randomNum, 1);
+        }
+        numberList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        setButtonText();
+      }
+
+      function setButtonText() {
+        if (!currentNum) {
+          resetButton.innerText = "start!";
+        } else {
+          resetButton.innerText = "reset Number";
+        }
+      }
+
+      function checkAnswer(submitNum) {
         let answerNum = String(currentNum);
 
         let strike = 0;
@@ -89,10 +85,10 @@
             ball += 1;
           }
         }
-        renderScore(strike, ball);
+        renderScore(strike, ball, submitNum);
       }
 
-      function renderScore(strike, ball) {
+      function renderScore(strike, ball, submitNum) {
         let scoreText = "";
         let countText = "";
         scoreCount += 1;
@@ -101,13 +97,11 @@
           window.alert("정답!");
           countText = `${scoreCount}번만에 맞히셨습니다.`;
           scoreText = ` 게임을 종료합니다.`;
-        }
-
-        if (strike + ball < 1) {
-          countText = `${scoreCount}번째 시도: answer_num`;
+        } else if (strike + ball < 1) {
+          countText = `${scoreCount}번째 시도: ${submitNum}`;
           scoreText = ` 맞는 숫자가 없습니다!`;
         } else {
-          countText = `${scoreCount}번째 시도: answer_num`;
+          countText = `${scoreCount}번째 시도: ${submitNum}`;
           scoreText = ` strike: ${strike} / ball: ${ball}`;
         }
 
@@ -126,13 +120,11 @@
           window.alert("start버튼을 먼저 눌러주세요!");
           return;
         }
-        // console.log(submitInput.length);
-        // console.log(submitInput.length === 3);
-        // if (submitInput.legnth !== 3) {
-        //   window.alert("3자리 숫자를 입력해주세요!");
-        //   return;
-        // }
 
+        if (submitInput.length !== 3) {
+          window.alert("3자리 숫자를 입력해주세요!");
+          return;
+        }
         if (
           submitInput[0] === submitInput[1] ||
           submitInput[0] === submitInput[2] ||
@@ -141,7 +133,8 @@
           window.alert("서로 다른 3개의 숫자를 입력해주세요!");
           return;
         }
-        checkAnswer();
+
+        checkAnswer(submitInput);
       }
 
       setButton();
